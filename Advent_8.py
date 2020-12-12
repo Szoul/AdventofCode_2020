@@ -26,43 +26,38 @@ def check_acc_at_infinite_loop_start(runtime_list):
 
     while position not in run_history:
         instruction = runtime_list[position]
+
+        # for Question 2
+        if instruction == "Goodbye, and thanks for all the fish":
+            return "finished", total_acc
+
         run_history.append(position)
         next_position, acc = read_instruction(instruction)
         total_acc += acc
         position += next_position
 
-        # for Question 2
-        if position == len(runtime_list):
-            return total_acc, len(run_history)
-
     return total_acc, len(run_history)
 
 
-print(check_acc_at_infinite_loop_start(compiled_text))
-print(len(compiled_text))
+print(check_acc_at_infinite_loop_start(compiled_text)[0])
 
 
+# 2: change one item "nop" to "jmp" or the other way round, so that the line after the last line would be reached
 import copy
-already_tested = []
-current_test = []
+
+compiled_text.append("Goodbye, and thanks for all the fish")
 
 for x in range(len(compiled_text)):
-    if compiled_text[x].startswith("nop"):
-        current_test = copy.deepcopy(compiled_text)
-        current_test[x] = current_test[x].replace("nop", "jmp")
-        acc, length = check_acc_at_infinite_loop_start(current_test)
-        if length == len(compiled_text):
-            break
+    test = copy.deepcopy(compiled_text)
+    if test[x].startswith("nop"):
+        test[x] = "jmp"+test[x][3:]
+    elif test[x].startswith("jmp"):
+        test[x] = "nop" + test[x][3:]
 
-    elif compiled_text[x].startswith("jmp"):
-        current_test = copy.deepcopy(compiled_text)
-        current_test[x] = current_test[x].replace("jmp", "nop")
-        acc, length = check_acc_at_infinite_loop_start(current_test)
-        if length == len(compiled_text):
-            break
+    finish_comment, acc = check_acc_at_infinite_loop_start(test)
+    if finish_comment == "finished":
+        break
 
-    else:
-        pass
+print(acc)
 
-print (acc, length)
 

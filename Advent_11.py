@@ -7,13 +7,13 @@ with open("Advent_11_Seats.txt", "r") as text_file:
         compiled_text.append(list(line.strip()))
 
 
-def determine_change(y_position, x_position, seat_list):
-    character = seat_list[y_position][x_position]
+def determine_change(y_pos, x_pos, seating_list):
+    character = seating_list[y_pos][x_pos]
     amount_of_surrounding_occupied_seats = 0
 
     for y, x in [(1, 1), (1, 0), (1, -1), (0, 1), (0, -1), (-1, 1), (-1, 0), (-1, -1)]:
         try:
-            if seat_list[y_position+y][x_position+x] == "#":
+            if seating_list[y_pos+y][x_pos+x] == "#":
                 amount_of_surrounding_occupied_seats += 1
         except IndexError:
             continue
@@ -26,22 +26,19 @@ def determine_change(y_position, x_position, seat_list):
     return character
 
 
-current_seats = copy.deepcopy(compiled_text)
-while True:
-    last_seat_distribution = copy.deepcopy(current_seats)
+seat_list = copy.deepcopy(compiled_text)
+last_seat_list = []
 
-    for y_pos in range(len(last_seat_distribution)):
-        for x_pos in range(len(last_seat_distribution[y_pos])):
-            current_seats[y_pos][x_pos] = determine_change(y_pos, x_pos, last_seat_distribution)
+while seat_list != last_seat_list:
+    last_seat_list = copy.deepcopy(seat_list)
+    for y_position in range(len(last_seat_list)):
+        for x_position in range(len(last_seat_list[y_position])):
+            seat_list[y_position][x_position] = determine_change(y_position, x_position, last_seat_list)
 
-    if last_seat_distribution == current_seats:
-        break
+count = 0
+for row in seat_list:
+    for thingy in row:
+        if thingy == "#":
+            count += 1
 
-total_occupied_amount = 0
-for line in current_seats:
-    print(line)
-    for place in line:
-        if place == "#":
-            total_occupied_amount += 1
-
-print(total_occupied_amount)
+print(count)

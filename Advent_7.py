@@ -1,3 +1,5 @@
+import copy
+
 with open("Advent_7_Bags.txt", "r") as text_file:
     text_lines = text_file.readlines()
     compiled_lines = []
@@ -55,33 +57,38 @@ for line in compiled_lines:
                 amount = 0
             else:
                 amount = int(items[0])
-            dict_of_all_bags_with_numbers[res[0][1]].append(amount)
-            dict_of_all_bags_with_numbers[res[0][1]].append(items[1])
+            dict_of_all_bags_with_numbers[res[0][1]].append([amount, items[1]])
 
-print (dict_of_all_bags_with_numbers)
-
-
-# contained bags is a list of [[already parsed bags][bags to parse]] with their amount
-def top_down_search(bag_type, bag_dict, contained_bags=[[], []]):
-    if len(contained_bags[0]) == 0:
-        contained_bags[1].append([1, bag_type])
-
-    for bag_and_amount in contained_bags[1]:
-        number = bag_and_amount[0]
-        bag = bag_and_amount[1]
-        inside_content = bag_dict[bag]
-        if inside_content[0] != 0:
-            for x in range(len(inside_content)):
-                if type(inside_content[x]) == int:
-                    inside_content[x] *= number
-                    contained_bags[1].append([inside_content[x], inside_content[x+1]])
-        contained_bags[0].append(bag_and_amount)
-        contained_bags[1].remove(bag_and_amount)
-
-    if len(contained_bags[1]) != 0:
-        top_down_search(bag_type, bag_dict, contained_bags)
-    else:
-        return contained_bags
+print(dict_of_all_bags_with_numbers)
 
 
-print(top_down_search("shiny gold", dict_of_all_bags_with_numbers))
+def contained_bags(bag_type, bag_amount, bag_dict):
+    content = copy.deepcopy(bag_dict[bag_type])     # mistake I made: dicts are mutable
+    for i in range(len(content)):
+        content[i][0] *= bag_amount
+
+    return content
+
+
+def search_through_bag(bag_type, bag_amount, bag_dict):
+    all_contained_bags = []
+    bags_to_search_through = [[bag_amount, bag_type]]
+
+    while len(bags_to_search_through) > 0:
+        for bag in bags_to_search_through:
+            if bag[0] != 0:
+                all_contained_bags.append(bag)
+                contents = contained_bags(bag[1], bag[0], bag_dict)
+                for bags in contents:
+                    bags_to_search_through.append(bags)
+            bags_to_search_through.remove(bag)
+
+    return all_contained_bags
+
+
+golden_content = search_through_bag("shiny gold", 1, dict_of_all_bags_with_numbers)
+number_of_bags = 0
+for item in golden_content:
+    number_of_bags += item[0]
+
+print(number_of_bags-1)
