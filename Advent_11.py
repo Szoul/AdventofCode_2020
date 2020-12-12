@@ -12,11 +12,11 @@ def determine_change(y_pos, x_pos, seating_list):
     amount_of_surrounding_occupied_seats = 0
 
     for y, x in [(1, 1), (1, 0), (1, -1), (0, 1), (0, -1), (-1, 1), (-1, 0), (-1, -1)]:
-        try:
-            if seating_list[y_pos+y][x_pos+x] == "#":
+        new_y = y_pos+y
+        new_x = x_pos+x
+        if 0 <= new_y <= len(seating_list)-1 and 0 <= new_x <= len(seating_list[0])-1:
+            if seating_list[new_y][new_x] == "#":
                 amount_of_surrounding_occupied_seats += 1
-        except IndexError:
-            continue
 
     if character == "L" and amount_of_surrounding_occupied_seats == 0:
         character = "#"
